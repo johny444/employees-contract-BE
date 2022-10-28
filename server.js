@@ -5,9 +5,9 @@ const bodyParser = require("body-parser");
 const examRoute = require("./routes/Exam");
 const subjectRoute = require("./routes/Subject");
 const questionRoute = require("./routes/question");
-// const studentRoute = require("./routes/student");
-// const resultRoute = require("./routes/result");
-// const teacherRoute = require("./routes/teacher");
+const studentRoute = require("./routes/student");
+const resultRoute = require("./routes/result");
+const teacherRoute = require("./routes/teacher");
 
 require("dotenv").config();
 
@@ -20,9 +20,9 @@ app.get("/", (req, res) => {
 app.use("/subject", subjectRoute);
 app.use("/exam", examRoute);
 app.use("/question", questionRoute);
-// app.use("/student", studentRoute);
-// app.use("/result", resultRoute);
-// app.use("/teacher", teacherRoute);
+app.use("/student", studentRoute);
+app.use("/result", resultRoute);
+app.use("/teacher", teacherRoute);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

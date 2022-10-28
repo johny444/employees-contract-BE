@@ -1,9 +1,9 @@
 var dbConn = require("../config/db.config");
 
-exports.getStudentList = (req, res) => {
+exports.getTeacherList = (req, res) => {
   //console.log('here all employees list');
   try {
-    dbConn.query("SELECT * FROM Student", (err, rows, fields) => {
+    dbConn.query("SELECT * FROM Teacher", (err, rows, fields) => {
       if (!err) {
         console.log("first", rows);
 
@@ -16,33 +16,34 @@ exports.getStudentList = (req, res) => {
     return res.status(500).send();
   }
 };
-exports.getStudentbyID = (req, res) => {
+exports.getTeacherbyID = (req, res) => {
   //console.log('here all employees list')
 
   try {
     dbConn.query(
-      "SELECT * FROM Student WHERE idStudent = ?",
+      "SELECT * FROM Teacher WHERE idTeacher = ?",
       [req.params.id],
       (err, rows, fields) => {
         if (!err) res.send(rows);
         else
           res
             .status(404)
-            .send({ message: "Not found Student with id " + rows });
+            .send({ message: "Not found Teacher with id " + rows });
       }
     );
   } catch (error) {
-    console.log("hellosssssssssssss");
-
-    res.status(500).send({ message: "Error retrieving Student with id=" + id });
+    res.status(404).send({
+      message: `Cannot get Teacher with id=${req.params.id}. Maybe Teacher was not found!`,
+      Error: err,
+    });
   }
 };
-exports.CreateStudent = (req, res) => {
-  const { STD_Name, STD_Password, MSSV, LSH } = req.body;
+exports.CreateTeacher = (req, res) => {
+  const { teacher_name, teacher_email, teacher_password, LSH } = req.body;
   try {
     dbConn.query(
-      "INSERT INTO Student(STD_Name,STD_Password,MSSV,LSH) VALUES(?, ?, ?,?)",
-      [STD_Name, STD_Password, MSSV, LSH],
+      "INSERT INTO Teacher(teacher_name,teacher_email,teacher_password,LSH) VALUES(?, ?, ?,?)",
+      [teacher_name, teacher_email, teacher_password, LSH],
       (err, rows, fields) => {
         if (!err) res.send({ message: "Create successfully!", data: req.body });
         else
@@ -58,10 +59,10 @@ exports.CreateStudent = (req, res) => {
     res.send({ message: `${error}` });
   }
 };
-exports.DeleteStudent = (req, res) => {
+exports.DeleteTeacher = (req, res) => {
   try {
     dbConn.query(
-      "DELETE FROM Student WHERE idStudent = ?",
+      "DELETE FROM Teacher WHERE idTeacher = ?",
       [req.params.id],
       (err, rows, fields) => {
         if (!err)
@@ -70,7 +71,7 @@ exports.DeleteStudent = (req, res) => {
           });
         else {
           res.status(404).send({
-            message: `Cannot delete Student with id=${req.params.id}. Maybe Student was not found!`,
+            message: `Cannot delete Teacher with id=${req.params.id}. Maybe Teacher was not found!`,
             Error: err,
           });
         }
@@ -82,8 +83,8 @@ exports.DeleteStudent = (req, res) => {
     res.send({ message: `${error}` });
   }
 };
-exports.UpdateStudent = (req, res) => {
-  const { STD_Name, STD_Password, MSSV, LSH } = req.body;
+exports.UpdateTeacher = (req, res) => {
+  const { teacher_name, teacher_email, teacher_password, LSH } = req.body;
   try {
     if (!req.body) {
       return res.status(400).send({
@@ -91,8 +92,8 @@ exports.UpdateStudent = (req, res) => {
       });
     }
     dbConn.query(
-      "UPDATE Student SET STD_Name=?,STD_Password=?,MSSV=?,LSH=? WHERE idStudent = ?",
-      [STD_Name, STD_Password, MSSV, LSH, req.params.id],
+      "UPDATE Teacher SET teacher_name=?,teacher_email=?,teacher_password=?,LSH=? WHERE idTeacher = ?",
+      [teacher_name, teacher_email, teacher_password, LSH, req.params.id],
       (err, rows, fields) => {
         if (!err)
           res.send({
@@ -101,7 +102,7 @@ exports.UpdateStudent = (req, res) => {
           });
         else {
           res.status(404).send({
-            message: `Cannot Update Student with id=${req.params.id}. Maybe Student was not found!`,
+            message: `Cannot Update Teacher with id=${req.params.id}. Maybe Teacher was not found!`,
             Error: err,
           });
         }
