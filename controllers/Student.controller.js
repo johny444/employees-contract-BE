@@ -38,11 +38,11 @@ exports.getStudentbyID = (req, res) => {
   }
 };
 exports.CreateStudent = (req, res) => {
-  const { STD_Name, STD_Password, MSSV, LSH } = req.body;
+  const { STD_Name, STD_Password, MSSV, LSH, idsubject } = req.body;
   try {
     dbConn.query(
-      "INSERT INTO Student(STD_Name,STD_Password,MSSV,LSH) VALUES(?, ?, ?,?)",
-      [STD_Name, STD_Password, MSSV, LSH],
+      "INSERT INTO Student(STD_Name,STD_Password,MSSV,LSH,idsubject) VALUES(?, ?, ?,?,?)",
+      [STD_Name, STD_Password, MSSV, LSH, idsubject],
       (err, rows, fields) => {
         if (!err) res.send({ message: "Create successfully!", data: req.body });
         else
@@ -83,7 +83,7 @@ exports.DeleteStudent = (req, res) => {
   }
 };
 exports.UpdateStudent = (req, res) => {
-  const { STD_Name, STD_Password, MSSV, LSH } = req.body;
+  const { STD_Name, STD_Password, MSSV, LSH, idsubject } = req.body;
   try {
     if (!req.body) {
       return res.status(400).send({
@@ -91,8 +91,8 @@ exports.UpdateStudent = (req, res) => {
       });
     }
     dbConn.query(
-      "UPDATE Student SET STD_Name=?,STD_Password=?,MSSV=?,LSH=? WHERE idStudent = ?",
-      [STD_Name, STD_Password, MSSV, LSH, req.params.id],
+      "UPDATE Student SET STD_Name=?,STD_Password=?,MSSV=?,LSH=? ,idsubject=? WHERE idStudent = ?",
+      [STD_Name, STD_Password, MSSV, LSH, idsubject, req.params.id],
       (err, rows, fields) => {
         if (!err)
           res.send({

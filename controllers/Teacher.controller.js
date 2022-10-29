@@ -5,7 +5,7 @@ exports.getTeacherList = (req, res) => {
   try {
     dbConn.query("SELECT * FROM Teacher", (err, rows, fields) => {
       if (!err) {
-        console.log("first", rows);
+        // console.log("first", rows);
 
         res.send({ message: "Get data successfully!", data: rows });
         // res.send(rows);

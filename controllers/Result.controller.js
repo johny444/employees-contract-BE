@@ -36,11 +36,11 @@ exports.getResultbyID = (req, res) => {
   }
 };
 exports.CreateResult = (req, res) => {
-  const { status, correctAnswer, marks } = req.body;
+  const { status, correctAnswer, marks, idstudent, idexam } = req.body;
   try {
     dbConn.query(
-      "INSERT INTO Result(status,correctAnswer,marks) VALUES(?, ?, ?)",
-      [status, correctAnswer, marks],
+      "INSERT INTO Result(status,correctAnswer,marks,idstudent,idexam) VALUES(?, ?, ?,?,?)",
+      [status, correctAnswer, marks, idstudent, idexam],
       (err, rows, fields) => {
         if (!err) res.send({ message: "Create successfully!", data: req.body });
         else
@@ -81,7 +81,7 @@ exports.DeleteResult = (req, res) => {
   }
 };
 exports.UpdateResult = (req, res) => {
-  const { status, correctAnswer, marks } = req.body;
+  const { status, correctAnswer, marks, idstudent, idexam } = req.body;
   try {
     if (!req.body) {
       return res.status(400).send({
@@ -89,8 +89,8 @@ exports.UpdateResult = (req, res) => {
       });
     }
     dbConn.query(
-      "UPDATE Result SET status=?,correctAnswer=?,marks=? WHERE idResult = ?",
-      [status, correctAnswer, marks, req.params.id],
+      "UPDATE Result SET status=?,correctAnswer=?,marks=?,idstudent=?,idexam=? WHERE idResult = ?",
+      [status, correctAnswer, marks, idstudent, idexam, req.params.id],
       (err, rows, fields) => {
         if (!err)
           res.send({

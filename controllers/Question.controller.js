@@ -106,6 +106,7 @@ exports.UpdateQuestion = (req, res) => {
     option_three,
     option_four,
     answer,
+    idexam,
   } = req.body;
   try {
     if (!req.body) {
@@ -114,7 +115,7 @@ exports.UpdateQuestion = (req, res) => {
       });
     }
     dbConn.query(
-      "UPDATE Question SET question_name=?,option_one=?,option_two=?,option_three=?,option_four=?,answer=? WHERE idQuestion = ?",
+      "UPDATE Question SET question_name=?,option_one=?,option_two=?,option_three=?,option_four=?,answer=?,idexam=? WHERE idQuestion = ?",
       [
         question_name,
         option_one,
@@ -122,6 +123,7 @@ exports.UpdateQuestion = (req, res) => {
         option_three,
         option_four,
         answer,
+        idexam,
         req.params.id,
       ],
       (err, rows, fields) => {

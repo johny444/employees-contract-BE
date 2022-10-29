@@ -38,11 +38,11 @@ exports.getSubjectbyID = (req, res) => {
   }
 };
 exports.CreateSubject = (req, res) => {
-  const { subject_name, Class, amount } = req.body;
+  const { subject_name, Class, amount, teacherId } = req.body;
   try {
     dbConn.query(
-      "INSERT INTO Subject(subject_name, Class, amount) VALUES(?, ?, ?)",
-      [subject_name, Class, amount],
+      "INSERT INTO Subject(subject_name, Class, amount,teacherId) VALUES(?, ?, ?,?)",
+      [subject_name, Class, amount, teacherId],
       (err, rows, fields) => {
         if (!err) res.send({ message: "Create successfully!", data: req.body });
         else

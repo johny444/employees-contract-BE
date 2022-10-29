@@ -35,11 +35,12 @@ exports.getExambyID = (req, res) => {
   }
 };
 exports.CreateExam = (req, res) => {
-  const { exam_desc, exam_totalQuestion, time } = req.body;
+  const { exam_desc, exam_totalQuestion, time, idsubject, idteacher } =
+    req.body;
   try {
     dbConn.query(
-      "INSERT INTO exam(exam_desc, exam_totalQuestion, time) VALUES(?, ?, ?)",
-      [exam_desc, exam_totalQuestion, time],
+      "INSERT INTO exam(exam_desc, exam_totalQuestion, time,idsubject,idteacher) VALUES(?, ?, ?,?, ?)",
+      [exam_desc, exam_totalQuestion, time, idsubject, idteacher],
       (err, rows, fields) => {
         if (!err) res.send({ message: "Create successfully!", data: req.body });
         else
@@ -77,7 +78,8 @@ exports.DeleteExam = (req, res) => {
   }
 };
 exports.UpdateExam = (req, res) => {
-  const { exam_desc, exam_totalQuestion, time } = req.body;
+  const { exam_desc, exam_totalQuestion, time, idsubject, idteacher } =
+    req.body;
   try {
     if (!req.body) {
       return res.status(400).send({
@@ -85,8 +87,15 @@ exports.UpdateExam = (req, res) => {
       });
     }
     dbConn.query(
-      "UPDATE exam SET exam_desc=?,exam_totalQuestion=?,time=? WHERE idexam = ?",
-      [exam_desc, exam_totalQuestion, time, req.params.id],
+      "UPDATE exam SET exam_desc=?,exam_totalQuestion=?,time=?,idsubject=? ,idteacher=? WHERE idexam = ?",
+      [
+        exam_desc,
+        exam_totalQuestion,
+        time,
+        idsubject,
+        idteacher,
+        req.params.id,
+      ],
       (err, rows, fields) => {
         if (!err)
           res.send({
