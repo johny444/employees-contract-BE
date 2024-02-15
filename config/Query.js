@@ -96,8 +96,6 @@ exports.DelTeacher = (req, res) => {
             ERROR_DES: err,
           });
         }
-
-        // res.send(rows);
       }
     );
   });
