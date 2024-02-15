@@ -1,26 +1,44 @@
-const mysql = require("mysql");
+const oracledb = require("oracledb");
+var dbConn;
 
-// create here mysql connection
+const checkconnect = async () => {
+  try {
+    dbConn = oracledb.getConnection(
+      {
+        user: "system",
+        password: "1234",
+        connectString: "localhost/orcl",
+      },
+      function (err, dbConn) {
+        if (err) {
+          console.error("err", err);
+          return;
+        }
 
-// const dbConn = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "node_mysql_crud_db",
-// });
+        console.log("Connected to Oracle database success!");
+        console.log("-----------------------------");
+        // var sql =
+        //   "CREATE TABLE customers (Id int,name VARCHAR(255), address VARCHAR(255))";
 
-var dbConn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "1234",
-  database: `exam-project`,
-  multipleStatements: true,
-});
-dbConn.connect((err) => {
-  if (!err) console.log("DB connection succeded.");
-  else
-    console.log(
-      "DB connection failed \n Error : " + JSON.stringify(err, undefined, 2)
+        // dbConn.execute(sql, function (err, result) {
+        //   if (err) {
+        //     console.error(err);
+        //     return;
+        //   }
+        //   console.log(result.rows);
+        // });
+        // -----------------------
+        // CREATE TABLE IF NOT EXISTS Companies (
+        //   id int,
+        //   name varchar(50),
+        //   address text,
+        //   email varchar(50),
+        //   phone varchar(10)
+        // );
+      }
     );
-});
-module.exports = dbConn;
+  } catch (error) {
+    console.log("error");
+  }
+};
+module.exports = checkconnect;

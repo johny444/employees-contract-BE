@@ -8,12 +8,14 @@ const questionRoute = require("./routes/question");
 const studentRoute = require("./routes/student");
 const resultRoute = require("./routes/result");
 const teacherRoute = require("./routes/teacher");
-
+const teacherCallRoute = require("./routes/TeacherCall");
+const DBconnect = require("./config/db.config");
+var logger = require("morgan");
 require("dotenv").config();
-
+app.use(logger("dev"));
 app.use(cors());
 app.use(bodyParser.json());
-
+DBconnect(); //Connect database check
 app.get("/", (req, res) => {
   res.json({ message: "Hello!!Welcome to bezkoder application." });
 });
@@ -23,6 +25,7 @@ app.use("/question", questionRoute);
 app.use("/student", studentRoute);
 app.use("/result", resultRoute);
 app.use("/teacher", teacherRoute);
+app.use("/teacherCall", teacherCallRoute);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
