@@ -1,6 +1,6 @@
 var dbConfig = require("../config/config");
 const oracledb = require("oracledb");
-
+const DB = require("../config/CheckDB");
 oracledb.autoCommit = true;
 var connectionProperties = {
   user: dbConfig.USER || "system",
@@ -9,8 +9,7 @@ var connectionProperties = {
 };
 let users = [];
 let obj = {};
-exports.getTeacherList = (req, res) => {
-  let { id, TeacherName, ACTION } = req.body;
+exports.GetTeacherList = (res) => {
   oracledb.getConnection(connectionProperties).then((dbConn) => {
     dbConn.execute("SELECT * FROM teacher", (err, data, fields) => {
       try {
@@ -20,7 +19,6 @@ exports.getTeacherList = (req, res) => {
             message: `NOT EXIST ANY DATA!`,
           };
         }
-
         data.rows.map((v, i) => {
           obj = {
             id: data.rows[i][0],
@@ -38,9 +36,10 @@ exports.getTeacherList = (req, res) => {
         });
       }
     });
+    DB.doRelease(dbConn);
   });
 };
-exports.getTeacherByID = (req, res) => {
+exports.GetTeacherByID = (id, res) => {
   oracledb.getConnection(connectionProperties).then((dbConn) => {
     dbConn.execute(
       "SELECT * FROM teacher WHERE ID = :ID",
@@ -52,7 +51,7 @@ exports.getTeacherByID = (req, res) => {
             console.log("data.rows[0]", data.rows[0]);
             console.log("Not EXIST");
             throw {
-              message: `CAN'T GET DATA WITH ID=${id}. MAYBE DATA WAS NOT EXIST!`,
+              message: `CAN'T GET DATA WITH ID=${id}. MAYBE DATA DID NOT EXIST!`,
             };
           }
           data.rows.forEach((v, i) => {
@@ -70,9 +69,10 @@ exports.getTeacherByID = (req, res) => {
         }
       }
     );
+    DB.doRelease(dbConn);
   });
 };
-exports.DelTeacher = (req, res) => {
+exports.DelTeacher = (id, res) => {
   oracledb.getConnection(connectionProperties).then((dbConn) => {
     dbConn.execute(
       "DELETE FROM teacher WHERE ID =:id",
@@ -83,12 +83,12 @@ exports.DelTeacher = (req, res) => {
           if (!data.lastRowid) {
             console.log("Not EXIST");
             throw {
-              message: `CAN'T GET DATA WITH ID=${id}. MAYBE DATA WAS NOT EXIST!`,
+              message: `CAN'T GET DATA WITH ID=${id}. MAYBE DATA DID NOT EXIST!`,
             };
           }
           res.send({
             message: `DELETE DATA ID=${id} SUCCESS!`,
-            data: data.rows,
+            rowsAffected: data.rowsAffected,
           });
         } catch (err) {
           res.status(404).send({
@@ -96,15 +96,14 @@ exports.DelTeacher = (req, res) => {
             ERROR_DES: err,
           });
         }
-
-        // res.send(rows);
       }
     );
+    DB.doRelease(dbConn);
   });
 };
 exports.InsertTeacher = (req, res) => {
+  let { id, TeacherName } = req.body;
   try {
-    console.log("TeacherName", TeacherName);
     if (!TeacherName) {
       console.log("Not EXIST");
       throw {
@@ -116,8 +115,12 @@ exports.InsertTeacher = (req, res) => {
           "INSERT INTO teacher(NAME) VALUES(:NAME)",
           [TeacherName],
           (err, data, fields) => {
+            console.log("data", data);
             if (!err) {
-              res.send({ message: "INSERT SUCCESS!", data: data.rows });
+              res.send({
+                message: "INSERT SUCCESS!",
+                rowsAffected: data.rowsAffected,
+              });
               console.log("Create success");
               // res.send(rows);
             } else {
@@ -128,6 +131,7 @@ exports.InsertTeacher = (req, res) => {
             }
           }
         );
+        DB.doRelease(dbConn);
       });
     }
   } catch (error) {
@@ -141,31 +145,30 @@ exports.InsertTeacher = (req, res) => {
 exports.UpdateTeacher = (req, res) => {
   let { id, TeacherName, ACTION } = req.body;
   oracledb.getConnection(connectionProperties).then((dbConn) => {
-    dbConn.execute("SELECT * FROM teacher", (err, data, fields) => {
-      try {
-        if (!data.rows[0]) {
-          console.log("Not EXIST");
-          throw {
-            message: `NOT EXIST ANY DATA!`,
-          };
+    dbConn.execute(
+      "UPDATE teacher SET name=:name WHERE id =:id",
+      [TeacherName, id],
+      (err, data, fields) => {
+        try {
+          console.log("data.rows", data);
+          if (!data.lastRowid) {
+            console.log("Not EXIST");
+            throw {
+              message: `CAN'T FIND DATA WITH ID=${id}. MAYBE DATA DID NOT EXIST!`,
+            };
+          }
+          res.send({
+            message: `UPDATE DATA ID=${id} SUCCESS!`,
+            rowsAffected: data.rowsAffected,
+          });
+        } catch (err) {
+          res.status(404).send({
+            MESSAGE: `EXCECUTE DATA WARNING`,
+            ERROR_DES: err,
+          });
         }
-
-        data.rows.map((v, i) => {
-          obj = {
-            id: data.rows[i][0],
-            name: data.rows[i][1],
-          };
-          users.push(obj);
-        });
-
-        res.send({ message: "GET DATA SUCCESS!", data: users });
-        users = [];
-      } catch (err) {
-        res.status(404).send({
-          MESSAGE: `Query Data Alert`,
-          ERROR_DES: err,
-        });
       }
-    });
+    );
+    DB.doRelease(dbConn);
   });
 };

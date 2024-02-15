@@ -9,13 +9,13 @@ const studentRoute = require("./routes/student");
 const resultRoute = require("./routes/result");
 const teacherRoute = require("./routes/teacher");
 const teacherCallRoute = require("./routes/TeacherCall");
-const DBconnect = require("./config/db.config");
+const DBconnect = require("./config/CheckDB");
 var logger = require("morgan");
 require("dotenv").config();
 app.use(logger("dev"));
 app.use(cors());
 app.use(bodyParser.json());
-DBconnect(); //Connect database check
+DBconnect.checkconnect(); //Connect database check
 app.get("/", (req, res) => {
   res.json({ message: "Hello!!Welcome to bezkoder application." });
 });

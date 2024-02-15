@@ -1,4 +1,4 @@
-var dbConn = require("../config/db.config");
+var dbConn = require("../config/CheckDB");
 
 exports.getQuestionList = (req, res) => {
   //console.log('here all employees list');
