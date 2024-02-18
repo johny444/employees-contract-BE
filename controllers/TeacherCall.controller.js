@@ -1,7 +1,7 @@
 const query = require("../Query/Teacher");
 
 exports.TeacherExcecute = (req, res) => {
-  let { id, TeacherName, ACTION } = req.body;
+  let { id, name, ACTION } = req.body;
   switch (ACTION) {
     case "GETAll":
       query.GetTeacherList(res);

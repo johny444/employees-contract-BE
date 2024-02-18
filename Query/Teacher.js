@@ -18,6 +18,13 @@ exports.GetTeacherList = (res) => {
           obj = {
             id: data.rows[i][0],
             name: data.rows[i][1],
+            email: data.rows[i][2],
+            password: data.rows[i][3],
+            gender: data.rows[i][4],
+            birthday: data.rows[i][5],
+            time: data.rows[i][6],
+            role: data.rows[i][7],
+            token: data.rows[i][8],
           };
           users.push(obj);
         });
@@ -53,6 +60,13 @@ exports.GetTeacherByID = (id, res) => {
             obj = {
               id: v[0],
               name: v[1],
+              email: v[2],
+              password: v[3],
+              gender: v[4],
+              birthday: v[5],
+              time: v[6],
+              role: v[7],
+              token: v[8],
             };
           });
           res.send({ message: "GET DATA SUCCESS!", data: obj });
@@ -70,15 +84,16 @@ exports.GetTeacherByID = (id, res) => {
 exports.DelTeacher = (id, res) => {
   console.log("id", id);
   let arr = id.split(",");
-  console.log("arr", arr.length);
   oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
     if (arr.length <= 1) {
-      console.log("<=1");
+      console.log("1");
       dbConn.execute(
         "DELETE FROM teacher WHERE ID =:id",
         [id],
         (err, data, fields) => {
           try {
+            console.log("data", data);
+            console.log("err", err);
             if (!data.lastRowid) {
               console.log("Not EXIST");
               throw {
@@ -100,8 +115,11 @@ exports.DelTeacher = (id, res) => {
     } else {
       console.log(">1");
       dbConn.execute(
-        `DELETE FROM TEACHER WHERE ID IN(${id})`,
+        "DELETE FROM TEACHER WHERE ID IN (" +
+          arr.map((id, index) => "'" + id + "'").join(",") +
+          ")",
         (err, data, fields) => {
+          console.log("error", err);
           try {
             if (!data.lastRowid) {
               console.log("Not EXIST");
@@ -126,9 +144,13 @@ exports.DelTeacher = (id, res) => {
   });
 };
 exports.InsertTeacher = (req, res) => {
-  let { id, TeacherName } = req.body;
+  // let { id, name, email, password, gender, birthday, time, role, token } =
+  //   req.body;
+  let { id, name, email, password, gender, birthday, time, role, token } =
+    req.body;
+  console.log("object insert", req.body);
   try {
-    if (!TeacherName) {
+    if (!name) {
       console.log("Not EXIST");
       throw {
         message: `INSERT FAIL MAKE SURE U HAVE INPUT CORRECT DATA!`,
@@ -136,8 +158,8 @@ exports.InsertTeacher = (req, res) => {
     } else {
       oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
         dbConn.execute(
-          "INSERT INTO teacher(NAME) VALUES(:NAME)",
-          [TeacherName],
+          "INSERT INTO teacher(name,email,password,gender) VALUES(:name,:email,:password,:gender)",
+          [name, email, password, gender],
           (err, data, fields) => {
             console.log("data", data);
             if (!err) {
@@ -167,11 +189,11 @@ exports.InsertTeacher = (req, res) => {
   }
 };
 exports.UpdateTeacher = (req, res) => {
-  let { id, TeacherName, ACTION } = req.body;
+  let { id, name, ACTION } = req.body;
   oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
     dbConn.execute(
       "UPDATE teacher SET name=:name WHERE id =:id",
-      [TeacherName, id],
+      [name, id],
       (err, data, fields) => {
         try {
           console.log("data.rows", data);

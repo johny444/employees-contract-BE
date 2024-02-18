@@ -20,13 +20,13 @@ exports.checkconnect = async () => {
         console.log("-----------------------------");
       }
     );
-    dbConn.release(function (err) {
-      if (err) {
-        console.error(err.message);
-      }
-    });
+    // dbConn.release(function (err) {
+    //   if (err) {
+    //     console.error(err.message);
+    //   }
+    // });
   } catch (error) {
-    console.log("error");
+    console.log("error:", error);
   }
 };
 exports.doRelease = (connection) => {
