@@ -7,9 +7,8 @@ const subjectRoute = require("./routes/ClassExam");
 const questionRoute = require("./routes/question");
 const studentRoute = require("./routes/Student");
 const resultRoute = require("./routes/result");
-const teacherRoute = require("./routes/teacher");
 const teacherCallRoute = require("./routes/TeacherCall");
-const test = require("./routes/Test");
+const teacherRoute = require("./routes/Teacher.Route");
 const DBconnect = require("./config/CheckDB");
 var logger = require("morgan");
 require("dotenv").config();
@@ -25,9 +24,8 @@ app.use("/exam", examRoute);
 app.use("/question", questionRoute);
 app.use("/student", studentRoute);
 app.use("/result", resultRoute);
-app.use("/teacher", teacherRoute);
 app.use("/teacherCall", teacherCallRoute);
-app.use("/test", test);
+app.use("/teacher", teacherRoute);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

@@ -1,4 +1,4 @@
-const query = require("../Query/Teacher");
+const query = require("../Query/Teacherc");
 
 exports.TeacherExcecute = (req, res) => {
   let { id, name, ACTION } = req.body;
