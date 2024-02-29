@@ -1,23 +1,23 @@
-const query = require("../Query/Question");
+const query = require("../Query/ClassExam");
 
-exports.QuestionExcecute = (req, res) => {
+exports.ClassExamExcecute = (req, res) => {
   let { id, name, ACTION } = req.body;
   switch (ACTION) {
     case "GETAll":
-      query.GetQuestionList(res);
+      query.GetClassExamList(res);
       break;
     case "GETID":
-      query.GetQuestionByID(id, res);
+      query.GetClassExamByID(id, res);
       break;
     case "DELETE":
-      query.DelQuestion(id, res);
+      query.DelClassExam(id, res);
       break;
     case "INSERT":
-      query.InsertQuestion(req, res);
+      query.InsertClassExam(req, res);
       break;
 
     case "UPDATE":
-      query.UpdateQuestion(req, res);
+      query.UpdateClassExam(req, res);
       break;
 
     default:

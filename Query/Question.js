@@ -4,9 +4,9 @@ oracledb.autoCommit = true;
 
 let users = [];
 let obj = {};
-exports.GetTeacherList = (res) => {
+exports.GetQuestionList = (res) => {
   oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
-    dbConn.execute("SELECT * FROM teacher", (err, data, fields) => {
+    dbConn.execute("SELECT * FROM STUDENT", (err, data, fields) => {
       try {
         if (!data.rows[0]) {
           console.log("Not EXIST");
@@ -14,18 +14,19 @@ exports.GetTeacherList = (res) => {
             message: `NOT HAVE ANY DATA!`,
           };
         }
-        console.log("data.rows", typeof data.rows);
         data.rows.map((v, i) => {
           obj = {
             id: data.rows[i][0],
-            name: data.rows[i][1],
-            email: data.rows[i][2],
-            password: data.rows[i][3],
+            role: data.rows[i][1],
+            name: data.rows[i][2],
+            email: data.rows[i][3],
             gender: data.rows[i][4],
-            birthday: data.rows[i][5],
-            time: data.rows[i][6],
-            role: data.rows[i][7],
-            token: data.rows[i][8],
+            password: data.rows[i][5],
+            studentcode: data.rows[i][6],
+            birthday: data.rows[i][7],
+            examid: data.rows[i][8],
+            time: data.rows[i][9],
+            token: data.rows[i][10],
           };
           users.push(obj);
         });
@@ -42,10 +43,10 @@ exports.GetTeacherList = (res) => {
     DB.doRelease(dbConn);
   });
 };
-exports.GetTeacherByID = (id, res) => {
+exports.GetQuestionByID = (id, res) => {
   oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
     dbConn.execute(
-      "SELECT * FROM teacher WHERE ID = :ID",
+      "SELECT * FROM STUDENT WHERE ID = :ID",
       [id],
       (err, data, fields) => {
         try {
@@ -60,14 +61,16 @@ exports.GetTeacherByID = (id, res) => {
           data.rows.forEach((v, i) => {
             obj = {
               id: v[0],
-              name: v[1],
-              email: v[2],
-              password: v[3],
+              role: v[1],
+              name: v[2],
+              email: v[3],
               gender: v[4],
-              birthday: v[5],
-              time: v[6],
-              role: v[7],
-              token: v[8],
+              password: v[5],
+              studentcode: v[6],
+              birthday: v[7],
+              examid: v[8],
+              time: v[9],
+              token: v[10],
             };
           });
           res.send({ message: "GET DATA SUCCESS!", data: obj });
@@ -82,19 +85,19 @@ exports.GetTeacherByID = (id, res) => {
     DB.doRelease(dbConn);
   });
 };
-exports.DelTeacher = (id, res) => {
-  console.log("id", id);
+exports.DelQuestion = (id, res) => {
   let arr = id.split(",");
+  console.log("arr", arr);
   oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
     if (arr.length <= 1) {
-      console.log("1");
+      console.log("<=1");
       dbConn.execute(
-        "DELETE FROM teacher WHERE ID =:id",
+        "DELETE FROM STUDENT WHERE ID =:id",
         [id],
         (err, data, fields) => {
           try {
             console.log("data", data);
-            console.log("err", err);
+            // console.log("err", err);
             if (!data.lastRowid) {
               console.log("Not EXIST");
               throw {
@@ -106,6 +109,7 @@ exports.DelTeacher = (id, res) => {
               rowsAffected: data.rowsAffected + " ROWS DELETE",
             });
           } catch (err) {
+            // console.log("err catch", err);
             res.status(404).send({
               MESSAGE: `EXCECUTE DATA WARNING`,
               ERROR_DES: err,
@@ -116,13 +120,16 @@ exports.DelTeacher = (id, res) => {
     } else {
       console.log(">1");
       dbConn.execute(
-        "DELETE FROM TEACHER WHERE ID IN (" +
+        "DELETE FROM STUDENT WHERE ID IN (" +
           arr.map((id, index) => "'" + id + "'").join(",") +
           ")",
         (err, data, fields) => {
-          console.log("error", err);
           try {
-            if (!data.lastRowid) {
+            // console.log("data", data);
+            // console.log("err", err);
+            if (err) {
+              throw err;
+            } else if (!data.lastRowid) {
               console.log("Not EXIST");
               throw {
                 message: `CAN'T GET DATA WITH ID=${id}. MAYBE DATA DID NOT EXIST!`,
@@ -133,6 +140,7 @@ exports.DelTeacher = (id, res) => {
               rowsAffected: data.rowsAffected + " ROWS DELETE",
             });
           } catch (err) {
+            console.log("error:", err);
             res.status(404).send({
               MESSAGE: `EXCECUTE DATA WARNING`,
               ERROR_DES: err,
@@ -144,12 +152,12 @@ exports.DelTeacher = (id, res) => {
     DB.doRelease(dbConn);
   });
 };
-exports.InsertTeacher = (req, res) => {
+exports.InsertQuestion = (req, res) => {
   // let { id, name, email, password, gender, birthday, time, role, token } =
   //   req.body;
   let { id, name, email, password, gender, birthday, time, role, token } =
     req.body;
-  console.log("object insert", req.body);
+  console.log("object", req.body);
   try {
     if (!name) {
       console.log("Not EXIST");
@@ -159,10 +167,11 @@ exports.InsertTeacher = (req, res) => {
     } else {
       oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
         dbConn.execute(
-          "INSERT INTO teacher(name,email,password,gender) VALUES(:name,:email,:password,:gender)",
+          "INSERT INTO STUDENT(name,email,password,gender) VALUES(:name,:email,:password,:gender)",
           [name, email, password, gender],
           (err, data, fields) => {
             console.log("data", data);
+
             if (!err) {
               res.send({
                 message: "INSERT SUCCESS!",
@@ -171,6 +180,7 @@ exports.InsertTeacher = (req, res) => {
               console.log("Create success");
               // res.send(rows);
             } else {
+              console.log("err", err);
               res.status(404).send({
                 message: "Error while inserting a user into the database",
                 Error: err,
@@ -189,12 +199,13 @@ exports.InsertTeacher = (req, res) => {
     });
   }
 };
-exports.UpdateTeacher = (req, res) => {
-  let { id, name, ACTION } = req.body;
+exports.UpdateQuestion = (req, res) => {
+  let { id, name, email, password, gender, birthday, time, role, token } =
+    req.body;
   oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
     dbConn.execute(
-      "UPDATE teacher SET name=:name WHERE id =:id",
-      [name, id],
+      "UPDATE STUDENT SET name=:name,email=:email,password=:password,gender=:gender WHERE id =:id",
+      [name, email, password, gender, id],
       (err, data, fields) => {
         try {
           console.log("data.rows", data);
