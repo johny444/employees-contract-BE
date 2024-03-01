@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const test = require("../Query/Teacher");
+const studentController = require("../Query/Teacher");
 
-router.post("/", test.GetTest);
+router.post("/", studentController.CRUDTEACHER);
 
 module.exports = router;

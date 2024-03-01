@@ -23,7 +23,7 @@ const GetData = async (resultSet) => {
     users.push(obj);
   }
 };
-exports.GetTest = (req, res) => {
+exports.CRUDTEACHER = (req, res) => {
   let {
     id,
     name,
