@@ -49,7 +49,7 @@ exports.login = async (req, res, next) => {
         try {
           const user = data;
           const result = data.rows.find(([email]) => email === req.body.email);
-
+          console.log("result", result);
           if (result) {
             obj = {
               id: result[1],
@@ -60,23 +60,17 @@ exports.login = async (req, res, next) => {
               role: result[5],
             };
             users.push(obj);
-            const token = jwt.sign({ userjwt: users }, config.secret, {
+            const token = jwt.sign({ user: users }, config.secret, {
               algorithm: "HS256",
               allowInsecureKeySizes: true,
               expiresIn: 86400, // 24 hours
             });
-            res
-              .cookie("token", token, {
-                maxAge: 300000,
-                secure: true,
-                httpOnly: true,
-                sameSite: "none",
-              })
-              // .status(200)
-              // .send({ message: "Object found", data: users, token: token });
-              .status(200)
-              .send({ message: "ACCOUNT VALID", token: token });
-            console.log("token", token);
+            res.status(200).send({
+              message: "ACCOUNT VALID",
+              token: token,
+              role: users[0].role,
+            });
+            console.log("users.role", users[0].role);
             // next();
             console.log("ACCOUNT VALID");
             users = [];
@@ -122,34 +116,30 @@ exports.login = async (req, res, next) => {
     DB.doRelease(dbConn);
   });
 };
-exports.getdataToken = (req, res) => {
+exports.authenticateToken = (req, res, next) => {
   try {
     console.log("------------------Login 2------------------------");
-    // console.log("req.cookies", req.cookies.token);
-    const authToken = req.cookies.token;
+    // const authToken = req.cookies.token;
+    const authHeader = req.headers["authorization"];
+    const authToken = authHeader && authHeader.split(" ")[1];
     console.log("authToken", authToken);
     if (!authToken) {
       return res.sendStatus(403);
     }
-    res.send({ token: authToken });
+
+    // res.send({ token: authToken });
     //check Token correct
     const checktoken = jwt.verify(authToken, config.secret);
     console.log("checktoken:", checktoken);
-    // res.send({ message: checktoken.userjwt });
+    // res.send({ message: checktoken.user });
+    req.user = checktoken.user;
+    next();
   } catch (error) {
     console.log("error catch:", error);
     return res.status(500).send({ message: error.message });
   }
 };
 exports.logout = async (req, res) => {
-  // try {
-  //   req.session = null;
-  //   return res.status(200).send({
-  //     message: "You've been signed out!",
-  //   });
-  // } catch (err) {
-  //   this.next(err);
-  // }
   try {
     return res
       .clearCookie("token")

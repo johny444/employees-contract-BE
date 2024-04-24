@@ -21,8 +21,8 @@ const GetData = async (resultSet) => {
     obj = {
       id: row[0],
       subjectExam: row[1],
-      status: row[2],
-      classExam: row[3],
+      classExam: row[2],
+      status: row[3],
       time: row[4],
       teacherID: row[5],
     };
@@ -45,7 +45,7 @@ exports.CRUDCLASSEXAM = (req, res) => {
     rowsAffected: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
   };
   oracledb.getConnection(DB.DBProperties()).then(async (dbConn) => {
-    console.log("bindParams", bindParams);
+    // console.log("bindParams", bindParams);
     try {
       let result = await dbConn.execute(callStmt, bindParams);
       console.log("result.outBinds.s:", result);
@@ -67,6 +67,17 @@ exports.CRUDCLASSEXAM = (req, res) => {
           }
           break;
         case "GETID":
+          if (!result.outBinds.rowsAffected) {
+            res.send({
+              MESSAGE: result.outBinds.rs,
+            });
+          } else {
+            await GetData(resultSet);
+            res.send({ MESSAGE: result.outBinds.rs, DATA: records });
+            records = [];
+          }
+          break;
+        case "GETBYTEACHERID":
           if (!result.outBinds.rowsAffected) {
             res.send({
               MESSAGE: result.outBinds.rs,

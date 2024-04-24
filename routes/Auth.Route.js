@@ -1,16 +1,18 @@
 const { verifySignUp } = require("../middleware");
-const controller = require("../controllers/auth.controller");
+const Authcontroller = require("../controllers/auth.controller");
 const express = require("express");
 const router = express.Router();
 
 router.post(
   "/api/auth/signup",
   [verifySignUp.checkDuplicateUsernameOrEmail, verifySignUp.checkRolesExisted],
-  controller.signup
+  Authcontroller.signup
 );
 
-router.post("/auth/login", controller.login);
+router.post("/auth/login", Authcontroller.login);
 
-router.get("/auth/logout", controller.logout);
-router.get("/auth/getlogin", controller.getdataToken);
+router.get("/auth/logout", Authcontroller.logout);
+router.get("/Auth", Authcontroller.authenticateToken, (req, res) => {
+  res.json({ message: "Protected data accessed", user: req.user });
+});
 module.exports = router;

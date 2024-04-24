@@ -41,7 +41,7 @@ exports.CRUDRESULT = (req, res) => {
     rowsAffected: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
   };
   oracledb.getConnection(DB.DBProperties()).then(async (dbConn) => {
-    console.log("bindParams", bindParams);
+    // console.log("bindParams", bindParams);
     try {
       let result = await dbConn.execute(callStmt, bindParams);
       console.log("result.outBinds.s:", result);

@@ -4,7 +4,7 @@ oracledb.autoCommit = true;
 const callStmt = `BEGIN
 CRUDEXAM(
   :PRID,
-  :PRSUBJECTID,
+  :PRCLASSEXAMID,
   :PRTERM,
   :PRTIME,
    :prAction,
@@ -18,7 +18,7 @@ const GetData = async (resultSet) => {
   while ((row = await resultSet.getRow())) {
     obj = {
       id: row[0],
-      subjectid: row[1],
+      classExamid: row[1],
       term: row[2],
       time: row[3],
     };
@@ -26,10 +26,11 @@ const GetData = async (resultSet) => {
   }
 };
 exports.CRUDEXAM = (req, res) => {
-  let { id, subjectid, term, time, ACTION } = req.body;
+  let { id, classExamid, term, time, ACTION } = req.body;
+  console.log(" req.body:", req.body);
   const bindParams = {
     prID: id,
-    PRSUBJECTID: subjectid,
+    PRCLASSEXAMID: classExamid,
     PRTERM: term,
     PRTIME: time,
     prAction: ACTION,
@@ -38,10 +39,10 @@ exports.CRUDEXAM = (req, res) => {
     rowsAffected: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
   };
   oracledb.getConnection(DB.DBProperties()).then(async (dbConn) => {
-    console.log("bindParams", bindParams);
+    // console.log("bindParams", bindParams);
     try {
       let result = await dbConn.execute(callStmt, bindParams);
-      console.log("result.outBinds.s:", result);
+      // console.log("result.outBinds.s:", result);
       const resultSet = result.outBinds.cursor;
       switch (ACTION) {
         case "GETAll":

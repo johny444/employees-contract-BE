@@ -44,7 +44,7 @@ exports.CRUDQUESTION = (req, res) => {
     rowsAffected: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
   };
   oracledb.getConnection(DB.DBProperties()).then(async (dbConn) => {
-    console.log("bindParams", bindParams);
+    // console.log("bindParams", bindParams);
     try {
       let result = await dbConn.execute(callStmt, bindParams);
       console.log("result.outBinds.s:", result);
@@ -66,6 +66,17 @@ exports.CRUDQUESTION = (req, res) => {
           }
           break;
         case "GETID":
+          if (!result.outBinds.rowsAffected) {
+            res.send({
+              MESSAGE: result.outBinds.rs,
+            });
+          } else {
+            await GetData(resultSet);
+            res.send({ MESSAGE: result.outBinds.rs, DATA: records });
+            records = [];
+          }
+          break;
+        case "GETBYEXAMID":
           if (!result.outBinds.rowsAffected) {
             res.send({
               MESSAGE: result.outBinds.rs,

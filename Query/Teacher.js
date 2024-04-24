@@ -2,13 +2,14 @@ const oracledb = require("oracledb");
 const DB = require("../config/CheckDB");
 oracledb.autoCommit = true;
 const callStmt = `BEGIN
-CRUDTeacher(:prID, :prName, :prEmail, :prPassword, :prGender, :prBirthday, :prTime, :prRole, :prToken, :prAction, :rs, :cursor,:rowsAffected);
+CRUDTeacher(:prID, :prName, :prEmail, :prPassword, :prGender, :prBirthday, :prTime, :prRole, :prAction, :rs, :cursor,:rowsAffected);
 END;`;
 
 let users = [];
 let obj = {};
 const GetData = async (resultSet) => {
   while ((row = await resultSet.getRow())) {
+    console.log("row", row);
     obj = {
       id: row[0],
       name: row[1],
@@ -16,26 +17,16 @@ const GetData = async (resultSet) => {
       password: row[3],
       gender: row[4],
       birthday: row[5],
-      time: row[6],
-      role: row[7],
-      token: row[8],
+      role: row[6],
+      time: row[7],
     };
     users.push(obj);
   }
 };
 exports.CRUDTEACHER = (req, res) => {
-  let {
-    id,
-    name,
-    email,
-    password,
-    gender,
-    birthday,
-    time,
-    role,
-    token,
-    ACTION,
-  } = req.body;
+  let { id, name, email, password, gender, birthday, time, role, ACTION } =
+    req.body;
+  // console.log("req.body:", req.body);
   const bindParams = {
     prID: id,
     prName: name,
@@ -44,15 +35,14 @@ exports.CRUDTEACHER = (req, res) => {
     prGender: gender,
     prBirthday: birthday,
     prTime: time,
-    prRole: "Teacher",
-    prToken: "abc123",
+    prRole: role,
     prAction: ACTION,
     rs: { dir: oracledb.BIND_OUT, type: oracledb.STRING },
     cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
     rowsAffected: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
   };
   oracledb.getConnection(DB.DBProperties()).then(async (dbConn) => {
-    console.log("bindParams", bindParams);
+    // console.log("bindParams", bindParams);
     try {
       let result = await dbConn.execute(callStmt, bindParams);
       console.log("result.outBinds.s:", result);
