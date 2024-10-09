@@ -4,5 +4,5 @@ module.exports = {
   USER: "system",
   PASSWORD: "1234",
   dialect: "oracle",
-  CONNECTSTRING: "localhost/orcl",
+  CONNECTSTRING: "localhost/jorcl",
 };

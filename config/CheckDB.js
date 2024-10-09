@@ -3,12 +3,13 @@ var dbConfig = require("../config/config");
 var dbConn;
 
 exports.checkconnect = async () => {
+  // console.log("test:", process.env.TEST);
   try {
     dbConn = oracledb.getConnection(
       {
         user: "system",
         password: "1234",
-        connectString: "localhost/orcl",
+        connectString: "localhost/jorcl",
       },
       function (err, dbConn) {
         if (err) {

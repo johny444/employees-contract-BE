@@ -29,6 +29,7 @@ const GetData = async (resultSet) => {
 };
 exports.CRUDRESULT = (req, res) => {
   let { id, mark, status, studentid, time, ACTION } = req.body;
+  console.log("object:", req.body);
   const bindParams = {
     prID: id,
     PRMARK: mark,
