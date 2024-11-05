@@ -1,9 +1,5 @@
-// const db = require("../models");
 const config = require("../config/auth.config");
-// const User = db.user;
-// const Role = db.role;
 
-// const Op = db.Sequelize.Op;
 const oracledb = require("oracledb");
 const DB = require("../config/CheckDB");
 oracledb.autoCommit = true;
@@ -40,82 +36,69 @@ exports.signup = async (req, res) => {
 let users = [];
 let obj = {};
 exports.login = async (req, res, next) => {
-  console.log("req:", req.body);
+  // console.log("req:", req.body);
   const { email, password } = req.body;
-  oracledb.getConnection(DB.DBProperties()).then((dbConn) => {
-    dbConn.execute(
-      "SELECT email,id,name,gender,birthday, role FROM teacher UNION ALL SELECT email,id,name,gender,birthday, role FROM student",
-      (err, data, fields) => {
-        try {
-          const user = data;
-          const result = data.rows.find(([email]) => email === req.body.email);
-          console.log("result", result);
-          if (result) {
-            obj = {
-              id: result[1],
-              email: result[0],
-              name: result[2],
-              gender: result[3],
-              birthday: result[4],
-              role: result[5],
-            };
-            users.push(obj);
-            const token = jwt.sign({ user: users }, config.secret, {
-              algorithm: "HS256",
-              allowInsecureKeySizes: true,
-              expiresIn: 86400, // 24 hours
-            });
-            res.status(200).send({
-              message: "ACCOUNT VALID",
-              token: token,
-              role: users[0].role,
-            });
-            console.log("users.role", users[0].role);
-            // next();
-            console.log("ACCOUNT VALID");
-            users = [];
-          } else {
-            console.log("USER ACCOUNT INVALID");
-            res.status(200).send({ message: "USER ACCOUNT INVALID" });
-            // res.status(200).send({ message: "Object not found" });
-          }
-          // if (!user) {
-          //   return res.status(404).send({ message: "User Not found." });
-          // }
-
-          // const passwordIsValid = bcrypt.compareSync(
-          //   req.body.password,
-          //   user.password
-          // );
-
-          // if (!passwordIsValid) {
-          //   return res.status(401).send({
-          //     message: "Invalid Password!",
-          //   });
-          // }
-
-          // let authorities = [];
-          // const roles = await user.getRoles();
-          // for (let i = 0; i < roles.length; i++) {
-          //   authorities.push("ROLE_" + roles[i].name.toUpperCase());
-          // }
-
-          // req.session.token = token;
-          // return res.status(200).send({
-          //   id: user.id,
-          //   username: user.username,
-          //   email: user.email,
-          //   roles: authorities,
-          // });
-        } catch (error) {
-          console.log("error catch:", error);
-          return res.status(500).send({ message: error.message });
-        }
-      }
+  let dbConn;
+  try {
+    dbConn = await oracledb.getConnection(DB.DBProperties());
+    console.log("Connected to Oracle database!");
+    const result = await dbConn.execute(
+      "SELECT email,id,name,gender,birthday, role FROM teacher UNION ALL SELECT email,id,name,gender,birthday, role FROM student"
     );
-    DB.doRelease(dbConn);
-  });
+    // Check if there is an error in the result
+    if (result.rows.length === 0) {
+      console.log("USER ACCOUNT INVALID");
+      return res.status(200).send({ message: "USER ACCOUNT INVALID" });
+    }
+
+    // Find the user by email
+    const user = result.rows.find(([userEmail]) => userEmail === email);
+    // console.log("data", result.rows);
+    console.log("result", user);
+
+    if (user) {
+      obj = {
+        id: user[1],
+        email: user[0],
+        name: user[2],
+        gender: user[3],
+        birthday: user[4],
+        role: user[5],
+      };
+      users.push(obj);
+
+      const token = jwt.sign({ user: users }, config.secret, {
+        algorithm: "HS256",
+        allowInsecureKeySizes: true,
+        expiresIn: 86400, // 24 hours
+      });
+      res.status(200).send({
+        message: "LOGIN SUCCESS",
+        token: token,
+        role: users[0].role,
+      });
+      console.log("users.role", users[0].role);
+      console.log("LOGIN SUCCESS");
+      users = [];
+    } else {
+      console.log("USER ACCOUNT INVALID");
+      res.status(401).send({ message: "INVALID CREDENTIALS" });
+    }
+  } catch (error) {
+    console.log("error catch:", error);
+    return res.status(500).send({ message: error.message });
+  } finally {
+    // Change: Release the connection in the finally block to ensure it gets released
+    if (dbConn) {
+      try {
+        await DB.doRelease(dbConn);
+      } catch (releaseError) {
+        console.error("Error releasing connection:", releaseError);
+      }
+    }
+  }
 };
+
 exports.authenticateToken = (req, res, next) => {
   try {
     console.log("------------------Login 2------------------------");
@@ -136,7 +119,7 @@ exports.authenticateToken = (req, res, next) => {
     next();
   } catch (error) {
     console.log("error catch:", error);
-    return res.status(500).send({ message: error.message });
+    return res.status(500).send({ message: error });
   }
 };
 exports.logout = async (req, res) => {

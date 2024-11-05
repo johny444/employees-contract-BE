@@ -3,13 +3,12 @@ var dbConfig = require("../config/config");
 var dbConn;
 
 exports.checkconnect = async () => {
-  // console.log("test:", process.env.TEST);
   try {
     dbConn = oracledb.getConnection(
       {
-        user: "system",
-        password: "1234",
-        connectString: "localhost/jorcl",
+        user: process.env.USER,
+        password: process.env.PASSWORD,
+        connectString: process.env.CONNECTSTRING,
       },
       function (err, dbConn) {
         if (err) {
@@ -39,9 +38,9 @@ exports.doRelease = (connection) => {
 };
 exports.DBProperties = () => {
   let connectionProperties = {
-    user: dbConfig.USER || "system",
-    password: dbConfig.PASSWORD || "oracle",
-    connectString: dbConfig.CONNECTSTRING || "localhost/orcl",
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    connectString: process.env.CONNECTSTRING,
   };
   return connectionProperties;
 };

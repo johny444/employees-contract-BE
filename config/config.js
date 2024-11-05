@@ -1,8 +1,8 @@
 module.exports = {
   HOST: "localhost",
   DBPORT: "1521",
-  USER: "system",
-  PASSWORD: "1234",
+  USER: "ibmbgw",
+  PASSWORD: "ibmbgwlvb",
   dialect: "oracle",
-  CONNECTSTRING: "localhost/jorcl",
+  connectString: "10.1.254.6:1521/DBGW2",
 };
