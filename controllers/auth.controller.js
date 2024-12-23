@@ -36,7 +36,7 @@ exports.signup = async (req, res) => {
 let users = [];
 let obj = {};
 exports.login = async (req, res, next) => {
-  // console.log("req:", req.body);
+  console.log("request:", req);
   const { email, password } = req.body;
   let dbConn;
   try {
@@ -54,7 +54,7 @@ exports.login = async (req, res, next) => {
     // Find the user by email
     const user = result.rows.find(([userEmail]) => userEmail === email);
     // console.log("data", result.rows);
-    console.log("result", user);
+    // console.log("result", user);
 
     if (user) {
       obj = {
@@ -77,7 +77,7 @@ exports.login = async (req, res, next) => {
         token: token,
         role: users[0].role,
       });
-      console.log("users.role", users[0].role);
+      // console.log("users.role", users[0].role);
       console.log("LOGIN SUCCESS");
       users = [];
     } else {
@@ -105,7 +105,7 @@ exports.authenticateToken = (req, res, next) => {
     // const authToken = req.cookies.token;
     const authHeader = req.headers["authorization"];
     const authToken = authHeader && authHeader.split(" ")[1];
-    console.log("authToken", authToken);
+    // console.log("authToken", authToken);
     if (!authToken) {
       return res.sendStatus(403);
     }
@@ -113,7 +113,7 @@ exports.authenticateToken = (req, res, next) => {
     // res.send({ token: authToken });
     //check Token correct
     const checktoken = jwt.verify(authToken, config.secret);
-    console.log("checktoken:", checktoken);
+    // console.log("checktoken:", checktoken);
     // res.send({ message: checktoken.user });
     req.user = checktoken.user;
     next();
