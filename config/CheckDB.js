@@ -1,5 +1,4 @@
 const oracledb = require("oracledb");
-var dbConfig = require("../config/config");
 var dbConn;
 
 exports.checkconnect = async () => {

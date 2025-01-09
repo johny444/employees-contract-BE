@@ -3,12 +3,8 @@ const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const examRoute = require("./routes/Exam.Route");
 const classExamRoute = require("./routes/ClassExam.Route");
-const questionRoute = require("./routes/Question.Route");
-const studentRoute = require("./routes/Student.Route");
-const resultRoute = require("./routes/Result.Route");
-const teacherRoute = require("./routes/Teacher.Route");
+const EmployeeRoute = require("./routes/Employee.Route");
 const AuthRoute = require("./routes/Auth.Route");
 const DBconnect = require("./config/CheckDB");
 var logger = require("morgan");
@@ -21,12 +17,8 @@ DBconnect.checkconnect(); //Connect database check
 app.get("/", (req, res) => {
   res.json({ message: "Hello!!Welcome to bezkoder application." });
 });
-app.use("/classExam", classExamRoute);
-app.use("/exam", examRoute);
-app.use("/question", questionRoute);
-app.use("/student", studentRoute);
-app.use("/result", resultRoute);
-app.use("/teacher", teacherRoute);
+app.use("/employees", EmployeeRoute);
+
 app.use("/", AuthRoute);
 
 const PORT = process.env.PORT || 8080;
