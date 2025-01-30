@@ -3,8 +3,8 @@ const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const classExamRoute = require("./routes/ClassExam.Route");
 const EmployeeRoute = require("./routes/Employee.Route");
+const PositionRoute = require("./routes/EmployeePosition.Route");
 const AuthRoute = require("./routes/Auth.Route");
 const DBconnect = require("./config/CheckDB");
 var logger = require("morgan");
@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello!!Welcome to bezkoder application." });
 });
 app.use("/employees", EmployeeRoute);
+app.use("/employees-position", PositionRoute);
 
 app.use("/", AuthRoute);
 
