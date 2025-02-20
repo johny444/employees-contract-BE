@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const EmployeeRoute = require("./routes/Employee.Route");
 const PositionRoute = require("./routes/EmployeePosition.Route");
+const DayoffHist = require("./routes/EmployeeDayofHist.Route");
+const BranchUnit = require("./routes/EmployeeBranchUnit.Route");
 const AuthRoute = require("./routes/Auth.Route");
 const DBconnect = require("./config/CheckDB");
 var logger = require("morgan");
@@ -19,6 +21,8 @@ app.get("/", (req, res) => {
 });
 app.use("/employees", EmployeeRoute);
 app.use("/employees-position", PositionRoute);
+app.use("/employees-DayoffHist", DayoffHist);
+app.use("/employees-BranchUnit", BranchUnit);
 
 app.use("/", AuthRoute);
 
