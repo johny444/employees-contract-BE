@@ -4,10 +4,13 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const EmployeeRoute = require("./routes/Employee.Route");
+const EmployeePRRoute = require("./routes/EmployeePR.Route");
 const PositionRoute = require("./routes/EmployeePosition.Route");
 const DayoffHist = require("./routes/EmployeeDayofHist.Route");
 const BranchUnit = require("./routes/EmployeeBranchUnit.Route");
 const AuthRoute = require("./routes/Auth.Route");
+const UnitRoutes = require("./routes/Unit.Route");
+const FingerRoutes = require("./routes/Finger.Routes");
 const DBconnect = require("./config/CheckDB");
 var logger = require("morgan");
 require("dotenv").config();
@@ -20,9 +23,13 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello!!Welcome to bezkoder application." });
 });
 app.use("/employees", EmployeeRoute);
+// app.use("/employees-report", EmployeePRRoute);
 app.use("/employees-position", PositionRoute);
 app.use("/employees-DayoffHist", DayoffHist);
 app.use("/employees-BranchUnit", BranchUnit);
+
+app.use("/api", UnitRoutes);
+app.use("/api", FingerRoutes);
 
 app.use("/", AuthRoute);
 

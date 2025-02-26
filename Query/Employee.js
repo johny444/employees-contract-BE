@@ -6,7 +6,6 @@ left join HRLVB.contract_authorized c on t.empid=c.empid
 where c.active=1
 and  c.duration <> N'ບໍ່ມີກໍານົດ' and (c.enddate between :1 and :2 or c.enddate is null )
 order by t.dep_code, c.duration
-
 `;
 
 let records = [];
@@ -124,7 +123,7 @@ exports.GETEMPLOYEES_POSITION = (req, res) => {
     }
   });
 };
-const Dep = `select    LEAVEHIST_ID,e.empname, START_DATE, END_DATE, LEAVE_AMOUNT,
+const Dep = `select LEAVEHIST_ID,e.empname, START_DATE, END_DATE, LEAVE_AMOUNT,
 case when  STATUS_LEAVE='AL' then 'All day' when STATUS_LEAVE='MN' then 'Morning' when STATUS_LEAVE='AF' then 'Afternoon' else '-' end Part_of_day,  
 DES,
 case when t.STATUS='U' then 'Unauthorized'
@@ -133,7 +132,7 @@ case when t.STATUS='U' then 'Unauthorized'
      when t.STATUS='BA' then 'Authorized'
      else to_char(t.STATUS) end STATUS, MAKER, AUTH_ID, HR_AUTH_ID, e.Dep from LEAVEHISTDETAIL@Finger.lvb.la t 
 left join HRLVB.employees_view e on upper(e.userad)=upper(t.maker)
-where t.status not in ('HR','DR') and EVENT not in ('Edit','Del') and e.dep_code=nvl(:1,e.dep_code) and e.brn_code=nvl(:2,e.brn_code)
+where t.status not in ('HR','DR','HA','BA') and e.dep_code=nvl(:1,e.dep_code) and e.brn_code=nvl(:2,e.brn_code)
 and t.leaveyear=:3`;
 
 exports.DayOffHist = (req, res) => {
