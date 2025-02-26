@@ -4,19 +4,19 @@ const DB = require("../config/CheckDB");
 exports.GetFingerData = async (req, res) => {
   let connection;
   try {
-    // Connect to the database
+    // เชื่อมต่อกับฐานข้อมูล
     connection = await oracledb.getConnection(DB.DBProperties());
 
-    // Create filters and binds for the query
+    // สร้าง filters และ binds สำหรับ query
     const filters = [];
     const binds = {
-      branch: req.query.branch || 'LVB050', // Set default value
+      branch: req.query.branch || 'LVB050', // กำหนดค่า default
       departmentid: req.query.departmentid || null,
-      startDate: req.query.startDate || '2025-01-01', // Set default value
-      endDate: req.query.endDate || '2025-01-31', // Set default value
+      startDate: req.query.startDate || '2025-01-01', // กำหนดค่า default
+      endDate: req.query.endDate || '2025-01-31', // กำหนดค่า default
     };
 
-    // Create filters based on the available parameters
+    // สร้าง filter ตามพารามิเตอร์ที่มีอยู่
     if (req.query.branch) {
       filters.push("t.BRANCH = :branch");
     }
@@ -27,10 +27,10 @@ exports.GetFingerData = async (req, res) => {
       filters.push("t.datevalue BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')");
     }
 
-    // Create whereClause from filters
+    // สร้าง whereClause จาก filters
     const whereClause = filters.length > 0 ? `WHERE ${filters.join(" AND ")}` : "";
 
-    // Construct the SQL query
+    // สร้าง SQL Query
     const sql = `
        SELECT USERNAME, FULLNAME, t.branch, DEPARTMENTNAME, DATEVALUE, 
          CLOCKIN, CLOCKOUT, f.status_name || '/' || f.status_english AS Status
@@ -42,22 +42,22 @@ exports.GetFingerData = async (req, res) => {
   ORDER BY t.departmentid, USERNAME, t.datevalue
     `;
 
-    // Execute the query
+    // 
     const result = await connection.execute(sql, binds, {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
 
-    // Send the result back to the user
-    res.json({ message: "Data retrieved successfully", data: result.rows });
+    // ส่งผลลัพธ์กลับไปยังผู้ใช้
+    res.json({ message: "ดึงข้อมูลสำเร็จ", data: result.rows });
   } catch (error) {
-    console.error("Database error:", error.message || error);
-    res.status(500).json({ message: "Database error", error: error.message || "Unknown" });
+    console.error("ข้อผิดพลาดของฐานข้อมูล:", error.message || error);
+    res.status(500).json({ message: "ข้อผิดพลาดของฐานข้อมูล", error: error.message || "ไม่ทราบ" });
   } finally {
     if (connection) {
       try {
-        await connection.close(); // Close the connection
+        await connection.close(); // ปิดการเชื่อมต่อ
       } catch (closeError) {
-        console.error("Error while closing the connection:", closeError);
+        console.error("เกิดข้อผิดพลาดขณะปิดการเชื่อมต่อ:", closeError);
       }
     }
   }
